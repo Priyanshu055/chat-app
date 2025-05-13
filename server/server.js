@@ -13,32 +13,29 @@ const server = http.createServer(app);
 // const cors = require('cors');
 app.use(cors());
 
-
 // initialize socket.io server
-export const io=new Server(server,{
-    cors:{origin:"*"}
-})
+export const io = new Server(server, {
+    cors: { origin: "*" }
+});
 
 // store online user
-export const userSocketMap={};
+export const userSocketMap = {};
 
 // socket.io connection handler
+io.on("connection", (socket) => {
+    const userId = socket.handshake.query.userId;
+    console.log("User connected", userId);
 
-io.on("connection",(socket)=>{
-    const userId=socket.handshake.query.userId;
-    console.log("User connected",userId);
+    if (userId) userSocketMap[userId] = socket.id;
 
-    if(userId) userSocketMap[userId]=socket.id;
-
-    //   emit online users to all connected clients
-   
-    io.emit("getOnlineUsers",Object.keys(userSocketMap));
-    socket.on("disconnect",()=>{
-        console.log("User Disconnected",userId);
+    // emit online users to all connected clients
+    io.emit("getOnlineUsers", Object.keys(userSocketMap));
+    socket.on("disconnect", () => {
+        console.log("User Disconnected", userId);
         delete userSocketMap[userId];
-        io.emit("getOnlineUsers",Object.keys(userSocketMap))
-    })
-})
+        io.emit("getOnlineUsers", Object.keys(userSocketMap));
+    });
+});
 
 // Middleware
 app.use(express.json({ limit: "4mb" }));
@@ -54,12 +51,12 @@ app.use((err, req, res, next) => {
 });
 
 // Routes
-app.use("/api/status", (req, res) => res.json({ 
-    success: true, 
-    message: "Server is live" 
+app.use("/api/status", (req, res) => res.json({
+    success: true,
+    message: "Server is live"
 }));
 app.use("/api/auth", userRouter);
-app.use("/api/messages",messageRouter)
+app.use("/api/messages", messageRouter);
 
 // Database connection and server start
 const startServer = async () => {
@@ -76,3 +73,5 @@ const startServer = async () => {
 };
 
 startServer();
+
+export default server;
