@@ -3,7 +3,7 @@ import { Navigate, Route, Routes } from 'react-router-dom'
 import HomePage from './pages/HomePage'
 import LoginPage from './pages/LoginPage'
 import ProfilePage from './pages/ProfilePage'
-// import assets from './assets/chat-app-assets/chat-app-assets/assets' // assets.bgImage
+import assets from './assets/chat-app-assets/chat-app-assets/assets'
 import {Toaster} from 'react-hot-toast'
 import { useContext } from 'react'
 import { AuthContext } from '../context/AuthContext.jsx'
@@ -14,7 +14,7 @@ const App = () => {
   return (
     <div
       style={{ 
-        backgroundImage: `url(/bgImage.svg)`,
+        backgroundImage: `url(${assets.bgImage})`,
         backgroundSize: 'cover',
         backgroundRepeat: 'no-repeat',
         backgroundPosition: 'center',
