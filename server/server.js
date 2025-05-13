@@ -1,3 +1,4 @@
+// Users\PRIYANSHU\OneDrive\Desktop\chat-app\server\server.js
 import express from "express";
 import "dotenv/config";
 import cors from "cors";
@@ -7,20 +8,9 @@ import messageRouter from "./routes/messageRoutes.js";
 
 const app = express();
 
-app.use(cors());
-
 // Middleware
-app.use(express.json({ limit: "4mb" }));
 app.use(cors());
-
-// Error handling middleware
-app.use((err, req, res, next) => {
-    console.error("Server error:", err.message);
-    res.status(500).json({
-        success: false,
-        message: "Internal server error"
-    });
-});
+app.use(express.json({ limit: "4mb" }));
 
 // Routes
 app.use("/api/status", (req, res) => res.json({
@@ -29,8 +19,7 @@ app.use("/api/status", (req, res) => res.json({
 }));
 app.use("/api/auth", userRouter);
 app.use("/api/messages", messageRouter);
-
-let dbConnected = false; // Flag to track DB connection
+let dbConnected = false;
 
 const startServer = async () => {
     if (!dbConnected) {
@@ -40,31 +29,27 @@ const startServer = async () => {
             console.log("Database connected");
         } catch (error) {
             console.error("Failed to connect to database:", error.message);
-            throw error; // Re-throw the error
+            throw error;
         }
     }
 };
 
+// This is what Vercel will use
 export default async function handler(req, res) {
     try {
-        await startServer(); // Ensure DB connection
-
-        // Handle the request using Express app
-        app(req, res);
+        await startServer();
+        return app(req, res);
     } catch (error) {
-        console.error("Unhandled exception in handler:", error);
-        res.status(500).json({
+        console.error("Handler error:", error);
+        return res.status(500).json({
             success: false,
             message: "Internal server error"
         });
     }
 }
 
-// Optional: Start the server locally if not running on Vercel
+// Only for local development
 if (process.env.NODE_ENV !== "production") {
     const PORT = process.env.PORT || 5000;
-    app.listen(PORT, () => {
-        console.log(`Server is running on PORT: ${PORT}`);
-    });
+    app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 }
-
