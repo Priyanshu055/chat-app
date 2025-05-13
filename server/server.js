@@ -1,41 +1,13 @@
 import express from "express";
 import "dotenv/config";
 import cors from "cors";
-import http from "http";
 import { connectDB } from "./lib/db.js";
 import userRouter from "./routes/userRoutes.js";
 import messageRouter from "./routes/messageRoutes.js";
-import { Server } from "socket.io";
 
 const app = express();
-const server = http.createServer(app);
 
-// const cors = require('cors');
 app.use(cors());
-
-// initialize socket.io server
-export const io = new Server(server, {
-    cors: { origin: "*" }
-});
-
-// store online user
-export const userSocketMap = {};
-
-// socket.io connection handler
-io.on("connection", (socket) => {
-    const userId = socket.handshake.query.userId;
-    console.log("User connected", userId);
-
-    if (userId) userSocketMap[userId] = socket.id;
-
-    // emit online users to all connected clients
-    io.emit("getOnlineUsers", Object.keys(userSocketMap));
-    socket.on("disconnect", () => {
-        console.log("User Disconnected", userId);
-        delete userSocketMap[userId];
-        io.emit("getOnlineUsers", Object.keys(userSocketMap));
-    });
-});
 
 // Middleware
 app.use(express.json({ limit: "4mb" }));
@@ -58,20 +30,41 @@ app.use("/api/status", (req, res) => res.json({
 app.use("/api/auth", userRouter);
 app.use("/api/messages", messageRouter);
 
-// Database connection and server start
+let dbConnected = false; // Flag to track DB connection
+
 const startServer = async () => {
-    try {
-        await connectDB();
-        const PORT = process.env.PORT || 5000;
-        server.listen(PORT, () => {
-            console.log(`Server is running on PORT: ${PORT}`);
-        });
-    } catch (error) {
-        console.error("Failed to start server:", error.message);
-        process.exit(1);
+    if (!dbConnected) {
+        try {
+            await connectDB();
+            dbConnected = true;
+            console.log("Database connected");
+        } catch (error) {
+            console.error("Failed to connect to database:", error.message);
+            throw error; // Re-throw the error
+        }
     }
 };
 
-startServer();
+export default async function handler(req, res) {
+    try {
+        await startServer(); // Ensure DB connection
 
-export default server;
+        // Handle the request using Express app
+        app(req, res);
+    } catch (error) {
+        console.error("Unhandled exception in handler:", error);
+        res.status(500).json({
+            success: false,
+            message: "Internal server error"
+        });
+    }
+}
+
+// Optional: Start the server locally if not running on Vercel
+if (process.env.NODE_ENV !== "production") {
+    const PORT = process.env.PORT || 5000;
+    app.listen(PORT, () => {
+        console.log(`Server is running on PORT: ${PORT}`);
+    });
+}
+

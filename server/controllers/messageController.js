@@ -1,7 +1,6 @@
 import cloudinary from "../lib/cloudinary.js";
 import Message from "../module/message.js";
 import User from "../module/User.js";
-import {io, userSocketMap} from "../server.js";
 
 export const getUserForSidebar = async(req, res) => {
     try {
@@ -32,27 +31,16 @@ export const getUserForSidebar = async(req, res) => {
 };
 
 // get all messages for selected user
-export const getMessages = async(req, res) => {
+export const getMessages = async (req, res) => {
     try {
-        const {id: selectedUserId} = req.params;
-        const myId = req.user._id;
+        const { chatId } = req.params;
 
-        const messages = await Message.find({
-            $or: [
-                {senderId: myId, receiverId: selectedUserId},
-                {senderId: selectedUserId, receiverId: myId},
-            ]
-        });
+        const messages = await Message.find({ chatId });
 
-        await Message.updateMany(
-            {senderId: selectedUserId, receiverId: myId},
-            {seen: true}
-        );
-
-        res.json({success: true, messages});
-    } catch(error) {
-        console.log(error.message);
-        res.json({success: false, message: error.message});
+        res.status(200).json(messages);
+    } catch (error) {
+        console.error("Error getting messages:", error);
+        res.status(500).json({ message: "Failed to get messages" });
     }
 };
 
@@ -69,33 +57,21 @@ export const markMessageAsSeen = async(req, res) => {
 };
 
 // send message to selected user
-export const sendMessage = async(req, res) => {
+export const sendMessage = async (req, res) => {
     try {
-        const {text, image} = req.body;
-        const senderId = req.user._id;
-        const {id: receiverId} = req.params;
+        const { chatId, senderId, text } = req.body;
 
-        let imageUrl;
-        if(image) {
-            const uploadResponse = await cloudinary.uploader.upload(image);
-            imageUrl = uploadResponse.secure_url;
-        }
-
-        const newMessage = await Message.create({
+        const message = new Message({
+            chatId,
             senderId,
-            receiverId,
             text,
-            image: imageUrl
         });
-        
-        const receiverSocketId = userSocketMap[receiverId];
-        if(receiverSocketId) {
-            io.to(receiverSocketId).emit("newMessage", newMessage);
-        }
 
-        res.json({success: true, newMessage});
-    } catch(error) {
-        console.log(error.message);
-        res.json({success: false, message: error.message});
+        await message.save();
+
+        res.status(201).json(message);
+    } catch (error) {
+        console.error("Error sending message:", error);
+        res.status(500).json({ message: "Failed to send message" });
     }
 };
