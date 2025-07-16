@@ -11,12 +11,18 @@ const app = express();
 const server = http.createServer(app);
 
 // Middleware
-app.use(cors());
+app.use(cors({
+    origin: process.env.CLIENT_URL || "http://localhost:5173", // Add your client URL
+    credentials: true
+}));
 app.use(express.json({ limit: "4mb" }));
 
 // initialize socket.io server
 export const io = new Server(server, {
-    cors: { origin: "*" }
+    cors: {
+        origin: process.env.CLIENT_URL || "http://localhost:5173", // Add your client URL
+        credentials: true
+    }
 });
 
 // store online user
@@ -70,15 +76,4 @@ const startServer = async () => {
     }
 };
 
-// Export for Vercel
-export default async function handler(req, res) {
-    if (!io) {
-        await startServer();
-    }
-    return app(req, res);
-}
-
-// Start server if not in production
-if (process.env.NODE_ENV !== "production") {
-    startServer();
-}
+startServer();
