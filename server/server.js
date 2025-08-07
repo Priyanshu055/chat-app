@@ -18,7 +18,7 @@ app.use(cors({
 app.use(express.json({ limit: "4mb" }));
 
 // initialize socket.io server
-export const io = new Server(server, {
+const io = new Server(server, {
     cors: {
         origin: process.env.CLIENT_URL || "http://localhost:5173", // Add your client URL
         credentials: true
@@ -26,7 +26,13 @@ export const io = new Server(server, {
 });
 
 // store online user
-export const userSocketMap = {};
+ const userSocketMap = {};
+app.use((req, res, next) => {
+    req.io = io;
+    req.userSocketMap = userSocketMap;
+    next();
+});
+
 
 // socket.io connection handler
 io.on("connection", (socket) => {
@@ -45,14 +51,6 @@ io.on("connection", (socket) => {
     });
 });
 
-// Error handling middleware
-app.use((err, req, res, next) => {
-    console.error("Server error:", err.message);
-    res.status(500).json({
-        success: false,
-        message: "Internal server error"
-    });
-});
 
 // Routes
 app.use("/api/status", (req, res) => res.json({
@@ -61,6 +59,14 @@ app.use("/api/status", (req, res) => res.json({
 }));
 app.use("/api/auth", userRouter);
 app.use("/api/messages", messageRouter);
+
+app.use((err, req, res, next) => {
+    console.error("Server error:", err.message);
+    res.status(500).json({
+        success: false,
+        message: "Internal server error"
+    });
+});
 
 // Database connection and server start
 const startServer = async () => {

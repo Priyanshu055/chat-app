@@ -1,7 +1,7 @@
 import cloudinary from "../lib/cloudinary.js";
 import Message from "../module/message.js";
 import User from "../module/User.js";
-import {io, userSocketMap} from "../server.js";
+// import {io, userSocketMap} from "../server.js";
 
 export const getUserForSidebar = async(req, res) => {
     try {
@@ -71,6 +71,7 @@ export const markMessageAsSeen = async(req, res) => {
 // send message to selected user
 export const sendMessage = async(req, res) => {
     try {
+        const { io, userSocketMap } = req;
         const {text, image} = req.body;
         const senderId = req.user._id;
         const {id: receiverId} = req.params;
