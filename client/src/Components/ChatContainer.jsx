@@ -107,12 +107,77 @@ useEffect(()=>{
 
     </div>
   ) : (
-    <div className="flex items-center justify-center w-full h-full">
-      <div className="bg-white/10 backdrop-blur-lg rounded-xl flex flex-col md:flex-row items-center justify-center gap-4 md:gap-8 px-8 py-8 max-w-xl w-full mx-4">
-        <img src={assets.logo_icon} alt="" className="w-16 h-16 mb-2 md:mb-0" />
-        <p className="text-2xl font-semibold text-white text-center md:text-left whitespace-nowrap">
-          Chat anytime, anywhere
-        </p>
+    <div className="flex items-center justify-center w-full h-full relative overflow-hidden">
+      {/* Diagonal split background */}
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          zIndex: 0,
+          background: "linear-gradient(120deg, #fbc2eb 55%, #a6c1ee 100%)",
+          clipPath: "polygon(0 0, 100% 0, 100% 70%, 0 100%)",
+          opacity: 0.95,
+        }}
+      />
+      <div
+        style={{
+          position: "absolute",
+          inset: 0,
+          zIndex: 0,
+          background: "linear-gradient(120deg, #fff0 60%, #e0c3fc 100%)",
+          clipPath: "polygon(0 70%, 100% 30%, 100% 100%, 0 100%)",
+          opacity: 0.7,
+        }}
+      />
+      {/* Main content */}
+      <div
+        className="flex flex-col items-center justify-center px-10 py-14 max-w-xl w-full mx-4 z-10"
+        style={{
+          borderRadius: "2rem",
+          boxShadow: "0 8px 40px #a18cd122, 0 1.5px 12px #fbc2eb33",
+          background: "rgba(255,255,255,0.7)",
+          border: "2.5px solid #a18cd1",
+          transform: "skewY(-2deg) scale(1.01)",
+        }}
+      >
+        <div
+          style={{
+            width: 80,
+            height: 10,
+            borderRadius: 8,
+            background: "linear-gradient(90deg, #a18cd1 0%, #fbc2eb 60%, #8ec5fc 100%)",
+            marginBottom: 24,
+            marginTop: -10,
+            boxShadow: "0 2px 12px #a18cd122",
+            transform: "skewX(-12deg)",
+          }}
+        />
+        <h2
+          className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-purple-500 via-pink-400 to-blue-400 text-center tracking-widest"
+          style={{
+            letterSpacing: "6px",
+            lineHeight: 1.1,
+            marginBottom: 12,
+            textShadow: "0 2px 12px #fbc2eb, 0 1px 2px #a18cd1",
+            transform: "skewY(2deg)",
+          }}
+        >
+          CHAT<br />ANYTIME,<br />ANYWHERE
+        </h2>
+        <div
+          className="w-full text-center text-base font-semibold text-violet-700/80 tracking-wide"
+          style={{
+            background: "rgba(255,255,255,0.22)",
+            borderRadius: "1rem",
+            padding: "0.9rem 1.2rem",
+            marginTop: "1rem",
+            boxShadow: "0 2px 12px #a18cd122",
+            transform: "skewX(-2deg)",
+          }}
+        >
+          Select a user from the left to start a new conversation.<br />
+          <span className="font-bold text-purple-500">Your chats are just a click away!</span>
+        </div>
       </div>
     </div>
   )
