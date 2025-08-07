@@ -18,14 +18,24 @@ const RightSidebar = () => {
       <div
         className="w-full h-full flex flex-col justify-between relative"
         style={{
-          background:
-            "linear-gradient(135deg, #f8fafc 60%, #e0e7ff 100%)",
+          background: "linear-gradient(120deg, #e0c3fc 0%, #8ec5fc 100%)",
           borderRadius: "2rem",
-          boxShadow: "0 8px 40px #6366f144",
+          boxShadow: "0 8px 40px #8ec5fc44",
+          border: "2px solid #a18cd1",
+          backdropFilter: "blur(8px)",
         }}
       >
         <div>
-          <div className="pt-16 flex flex-col items-center gap-2 text-xs font-light mx-auto">
+          <div className="pt-16 flex flex-col items-center gap-2 text-xs font-light mx-auto"
+            style={{
+              background: "rgba(255,255,255,0.45)",
+              borderRadius: "1.5rem",
+              margin: "1rem",
+              boxShadow: "0 2px 16px #a18cd122",
+              border: "1.5px solid #e0c3fc",
+              padding: "1.5rem 0.5rem"
+            }}
+          >
             <img
               src={selectedUser.profilePic || assets.avatar_icon}
               alt=""
