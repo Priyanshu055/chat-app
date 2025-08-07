@@ -65,7 +65,7 @@ export const login = async (req, res) => {
         if (!userData) {
             return res.status(404).json({ 
                 success: false, 
-                message: "User not found" 
+                message: "User not found"
             });
         }
 
@@ -78,6 +78,9 @@ export const login = async (req, res) => {
         }
 
         const token = generateToken(userData._id);
+        userData.currentToken = token;
+        await userData.save();
+
         res.status(200).json({
             success: true,
             userData,
