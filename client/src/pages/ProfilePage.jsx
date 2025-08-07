@@ -12,21 +12,22 @@ const ProfilePage = () => {
   const [bio,setBio]=useState(authUser.bio)
 
 
-  const handleSubmit=async(e)=>{
-  e.preventDefault();
-   if(!selectedImg){
-    await updateProfile({fullName,bio})
-  navigate('/')
-}
- 
-const reader=new FileReader();
- reader.readAsDataURL(selectedImg);
-  reader.onloadend=async()=>{
-    const base64Image=reader.result;
-    await updateProfile({profilePic:base64Image,fullName:name,bio});
-    navigate('/');
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!selectedImg) {
+      await updateProfile({ fullName: name, bio }); // <-- use name here
+      navigate('/');
+      return; // add return to prevent further execution
+    }
+
+    const reader = new FileReader();
+    reader.readAsDataURL(selectedImg);
+    reader.onloadend = async () => {
+      const base64Image = reader.result;
+      await updateProfile({ profilePic: base64Image, fullName: name, bio });
+      navigate('/');
+    };
   }
-}
 
   return (
     <div className='min-h-screen bg-cover bg-no-repeat flex items-center justify-center'>
