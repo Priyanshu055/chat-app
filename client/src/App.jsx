@@ -3,6 +3,7 @@ import { Navigate, Route, Routes } from 'react-router-dom'
 import HomePage from './pages/HomePage'
 import LoginPage from './pages/LoginPage'
 import ProfilePage from './pages/ProfilePage'
+import LandingPage from './pages/LandingPage' // <-- Add this import
 import assets from './assets/chat-app-assets/chat-app-assets/assets'
 import {Toaster} from 'react-hot-toast'
 import { useContext } from 'react'
@@ -24,9 +25,11 @@ const App = () => {
     >
       <Toaster/>
       <Routes>
-        <Route path='/' element={authUser? <HomePage/>: <Navigate to="/login"/>} />
-        <Route path='/login' element={!authUser? <LoginPage/>:<Navigate to="/"/>} />
-        <Route path='/profile' element={authUser? <ProfilePage/>:<Navigate to="/login"/>} />
+        <Route path='/' element={!authUser ? <LandingPage /> : <Navigate to="/home" />} />
+        <Route path='/login' element={!authUser ? <LoginPage /> : <Navigate to="/home" />} />
+        <Route path='/signup' element={!authUser ? <LoginPage /> : <Navigate to="/home" />} />
+        <Route path='/profile' element={authUser ? <ProfilePage /> : <Navigate to="/login" />} />
+        <Route path='/home' element={authUser ? <HomePage /> : <Navigate to="/login" />} />
       </Routes>
     </div>
   )
