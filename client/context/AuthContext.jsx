@@ -122,7 +122,7 @@ export const AuthProvider = ({ children }) => {
             const { data } = await axios.put("/api/auth/update-profile", body);
 
             if (data.success) {
-                setAuthUser(data.user);
+                setAuthUser(data.user); // <--- THIS LINE updates the context state!
                 toast.success("Profile updated successfully");
             } else {
                 toast.error(data.message);
